@@ -93,7 +93,7 @@ void SRFT_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 
 
 	}
-	cout << "the processes take " << time-1 << endl;
+	//cout << "the processes take " << time-1 << endl;
 	
 
 
@@ -127,6 +127,6 @@ float SRFT_Turn_Around(vector<SRTF_Process> &sr) {
 
 
 		}
-		cout<<"avg turn around time" << (1.0*total / sr.size())<<endl;
+		//cout<<"avg turn around time" << (1.0*total / sr.size())<<endl;
 		return (1.0*total / sr.size());
 }
