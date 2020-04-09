@@ -23,7 +23,8 @@ SRTF_Process(int i , int b , int a) {
 	
 	
 }};
-void SRTF_Arrange(vector<SRTF_Process> & srft);
+void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Process> &v);
+
 bool cmp(SRTF_Process A, SRTF_Process B){
 	if (A.bt != B.bt)
 		return A.bt < B.bt;
@@ -31,35 +32,31 @@ bool cmp(SRTF_Process A, SRTF_Process B){
 		return A.at < B.at;
 }
 
-void SRFT_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids);
+void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids);
 
-float SRFT_Waiting_time(vector<SRTF_Process> &sr);
-float SRFT_Turn_Around(vector<SRTF_Process> &sr);
+float SRTF_Waiting_time(vector<SRTF_Process> &sr);
+float SRTF_Turn_Around(vector<SRTF_Process> &sr);
 int main()
 {
-	vector<int> ids;
 	vector<SRTF_Process> sr;
+	vector<int> ids = { 1,2,3,4,5 };
+	vector<int>burst = {10,5,3,6,3};
+	vector<int>arrival = { 0,1,2,24,25 };
 	
-	sr.push_back(SRTF_Process(1,8,0));
-	sr.push_back(SRTF_Process(2, 4, 1));
-	sr.push_back(SRTF_Process(3, 9, 2));
-	sr.push_back(SRTF_Process(4, 5, 3));
-
-	SRTF_Arrange(sr);
-	SRFT_Gantt_Chart(sr,ids);
-	SRFT_Waiting_time(sr);
-	SRFT_Turn_Around(sr);
-
+	//the main function take 4 vectors 
+	SRTF(ids, burst, arrival, sr);
+	//functions to calculate turn around & waiting times
+	cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
+	cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
+	
+	
 }
-void SRTF_Arrange(vector<SRTF_Process> & srft) {
 
-	sort(srft.begin(), srft.end(), cmp);
+void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
+{	
+	
 
-}
-void SRFT_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
-{
-
-	int time = 0, flag = 0;
+	int time = 0, flag = 0, num=sr.size();
 	while (flag!=1)
 	{	
 		flag = 1;
@@ -72,6 +69,9 @@ void SRFT_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 				ids.push_back(sr[i].id);
 				sr[i].rmt--;
 				flag = 0;
+				if (sr[i].rmt == 0) {
+					num--;
+				}
 				
 
 				for (int j = 0; j < sr.size(); j++) {
@@ -83,10 +83,20 @@ void SRFT_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 				break;
 				
 				
-			}
+			}	
 
 		}
+		if (num != 0 && flag==1) {
+			flag = 0;
+			ids.push_back(-1);
+			for (int j = 0; j < sr.size(); j++) {
+				if ( sr[j].at <= time && sr[j].rmt > 0) {
+					sr[j].wt++;
+				}
 
+			}
+		
+		}
 		time++;
 
 
@@ -101,7 +111,8 @@ void SRFT_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 
 
 }
-float SRFT_Waiting_time(vector<SRTF_Process> &sr) {
+float SRTF_Waiting_time(vector<SRTF_Process> &sr) {
+	
 	int total = 0;
 	for (int i = 0; i < sr.size(); i++) {
 
@@ -117,7 +128,8 @@ float SRFT_Waiting_time(vector<SRTF_Process> &sr) {
 
 
 }
-float SRFT_Turn_Around(vector<SRTF_Process> &sr) {
+float SRTF_Turn_Around(vector<SRTF_Process> &sr) {
+	
 	int total = 0;
 		for (int i = 0; i < sr.size(); i++) {
 
@@ -127,6 +139,74 @@ float SRFT_Turn_Around(vector<SRTF_Process> &sr) {
 
 
 		}
-		//cout<<"avg turn around time" << (1.0*total / sr.size())<<endl;
+		
 		return (1.0*total / sr.size());
+}
+
+
+void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Process> &v) {
+	vector<int>time_line;
+	//to put the input in SRFT vector 
+
+	for (int i = 0; i < id.size(); i++) {
+		v.push_back(SRTF_Process(id[i], burst[i], arival[i]));
+	}
+	id.clear();
+	burst.clear();
+	arival.clear();
+	
+	sort(v.begin(), v.end(), cmp);
+	SRTF_Gantt_Chart(v, time_line);
+	int lastid= time_line[0], gap=0, time=0;
+	
+	time_line.push_back(-1);
+	for (int i = 0; i < time_line.size(); i++) {
+
+		if (time_line[i] == lastid) {
+			if (time_line[i] != -1) {
+				time++;
+			}
+			else if (time_line[i] == -1) {
+				gap++;
+			}
+		}
+		else if (time_line[i] != lastid) {
+			if (lastid != -1 && time_line[i] != -1) {
+				id.push_back(lastid);
+				burst.push_back(time);
+				arival.push_back(gap);
+				lastid = time_line[i];
+				time = 1;
+				gap = 0;
+			}
+			else if (lastid != -1 && time_line[i] == -1) {
+				id.push_back(lastid);
+				burst.push_back(time);
+				arival.push_back(gap);
+				lastid = time_line[i];
+				time = 0;
+				gap = 1;
+			}
+			else if (lastid == -1) {
+				lastid = time_line[i];
+				time = 1;
+			}
+
+		}
+
+
+
+
+
+
+
+	}
+
+
+
+
+
+
+
+
 }
