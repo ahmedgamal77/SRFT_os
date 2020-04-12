@@ -7,14 +7,14 @@
 using namespace std;
 
 struct SRTF_Process {
-	int id; // Process ID 
+	string id; // Process ID 
 	int bt; // Burst Time 
 	int at; // Arrival Time
 	int rmt; // remaning time
 	int wt; // waiting time 
 
 
-	SRTF_Process(int i, int b, int a) {
+	SRTF_Process(string i, int b, int a) {
 		id = i;
 		bt = b;
 		at = a;
@@ -49,16 +49,16 @@ int main()
 	//the main function take 4 vectors 
 	SRTF(ids, burst, arrival, start, sr);
 	//functions to calculate turn around & waiting times
-	/*for (int i = 0; i < ids.size(); i++) {
+	for (int i = 0; i < ids.size(); i++) {
 		cout << "ID : " << ids[i] << " //Time :" << burst[i]  << " //Gap :" << arrival[i]<<" //start: "<<start[i] << endl;
-	}*/
+	}
 	//cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
 	//cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
 
 
 }
 
-void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
+void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<string> &ids)
 {
 
 
@@ -94,7 +94,7 @@ void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 		}
 		if (num != 0 && flag == 1) {
 			flag = 0;
-			ids.push_back(-1);
+			ids.push_back("-1");
 			for (int j = 0; j < sr.size(); j++) {
 				if (sr[j].at <= time && sr[j].rmt > 0) {
 					sr[j].wt++;
@@ -151,15 +151,12 @@ float SRTF_Turn_Around(vector<SRTF_Process> &sr) {
 
 
 void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> &start, vector<SRTF_Process> &v) {
-	vector<int>time_line;
+	vector<string>time_line;
 	//to put the input in SRFT vector 
 
 	for (int i = 0; i < id.size(); i++) {
-		int j=0;
-		string stra = id[i];
-		for (; j < stra.length(); j++) {  if (isdigit(stra[j])) break; } 
-		int temp = stoi(id[i].substr(j));
-		v.push_back(SRTF_Process(temp, burst[i], arival[i]));
+		
+		v.push_back(SRTF_Process(id[i], burst[i], arival[i]));
 	}
 	id.clear();
 	burst.clear();
@@ -167,37 +164,38 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> 
 
 	sort(v.begin(), v.end(), cmp);
 	SRTF_Gantt_Chart(v, time_line);
-	int lastid = time_line[0], gap = 0, time = 0;
+	int  gap = 0, time = 0;
+	string lastid = time_line[0];
 
-	time_line.push_back(-1);
+	time_line.push_back("-1");
 	for (int i = 0; i < time_line.size(); i++) {
 
 		if (time_line[i] == lastid) {
-			if (time_line[i] != -1) {
+			if (time_line[i] != "-1") {
 				time++;
 			}
-			else if (time_line[i] == -1) {
+			else if (time_line[i] == "-1") {
 				gap++;
 			}
 		}
 		else if (time_line[i] != lastid) {
-			if (lastid != -1 && time_line[i] != -1) {
-				id.push_back("P" + to_string(lastid));
+			if (lastid !="-1" && time_line[i] != "-1") {
+				id.push_back(lastid);
 				burst.push_back(time);
 				arival.push_back(gap);
 				lastid = time_line[i];
 				time = 1;
 				gap = 0;
 			}
-			else if (lastid != -1 && time_line[i] == -1) {
-				id.push_back("P" + to_string(lastid));
+			else if (lastid != "-1" && time_line[i] == "-1") {
+				id.push_back(lastid);
 				burst.push_back(time);
 				arival.push_back(gap);
 				lastid = time_line[i];
 				time = 0;
 				gap = 1;
 			}
-			else if (lastid == -1) {
+			else if (lastid == "-1") {
 				lastid = time_line[i];
 				time = 1;
 			}
