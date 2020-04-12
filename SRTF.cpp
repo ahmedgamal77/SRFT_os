@@ -3,6 +3,7 @@
 #include <iostream>
 #include<vector>
 #include<algorithm>
+#include<string>
 using namespace std;
 
 struct SRTF_Process {
@@ -23,7 +24,7 @@ SRTF_Process(int i , int b , int a) {
 	
 	
 }};
-void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Process> &v);
+void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &start, vector<SRTF_Process> &v);
 
 bool cmp(SRTF_Process A, SRTF_Process B){
 	if (A.bt != B.bt)
@@ -39,15 +40,19 @@ float SRTF_Turn_Around(vector<SRTF_Process> &sr);
 int main()
 {
 	vector<SRTF_Process> sr;
-	vector<int> ids = { 1,2,3,4,5 };
+	vector<string> ids = { "p1","p2","p3","p4","p5" };
 	vector<int>burst = {10,5,3,6,3};
 	vector<int>arrival = { 0,1,2,24,25 };
+	vector<int> start;
 	
 	//the main function take 4 vectors 
-	SRTF(ids, burst, arrival, sr);
+	SRTF(ids, burst, arrival,start, sr);
 	//functions to calculate turn around & waiting times
-	cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
-	cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
+	/*for (int i = 0; i < ids.size(); i++) {
+		cout << "ID : " << ids[i] << " //Time :" << burst[i]  << " //Gap :" << arrival[i]<<" //start: "<<start[i] << endl;
+	}*/
+	//cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
+	//cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
 	
 	
 }
@@ -144,17 +149,18 @@ float SRTF_Turn_Around(vector<SRTF_Process> &sr) {
 }
 
 
-void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Process> &v) {
+void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &start, vector<SRTF_Process> &v) {
 	vector<int>time_line;
 	//to put the input in SRFT vector 
 
 	for (int i = 0; i < id.size(); i++) {
-		v.push_back(SRTF_Process(id[i], burst[i], arival[i]));
+		int temp = stoi(id[i].substr(1));
+		v.push_back(SRTF_Process(temp, burst[i], arival[i]));
 	}
 	id.clear();
 	burst.clear();
 	arival.clear();
-	
+
 	sort(v.begin(), v.end(), cmp);
 	SRTF_Gantt_Chart(v, time_line);
 	int lastid= time_line[0], gap=0, time=0;
@@ -172,7 +178,7 @@ void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Pro
 		}
 		else if (time_line[i] != lastid) {
 			if (lastid != -1 && time_line[i] != -1) {
-				id.push_back(lastid);
+				id.push_back("P"+to_string(lastid));
 				burst.push_back(time);
 				arival.push_back(gap);
 				lastid = time_line[i];
@@ -180,7 +186,7 @@ void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Pro
 				gap = 0;
 			}
 			else if (lastid != -1 && time_line[i] == -1) {
-				id.push_back(lastid);
+				id.push_back("P"+ to_string(lastid));
 				burst.push_back(time);
 				arival.push_back(gap);
 				lastid = time_line[i];
@@ -193,13 +199,19 @@ void SRTF(vector<int>&id, vector<int>&burst, vector<int>&arival, vector<SRTF_Pro
 			}
 
 		}
+		
 
 
 
 
 
 
-
+	}
+	int sta = 0;
+	for (int i = 0; i < burst.size(); i++) {
+		sta += arival[i];
+		start.push_back(sta);
+		sta += burst[i];
 	}
 
 
