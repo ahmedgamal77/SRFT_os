@@ -12,21 +12,22 @@ struct SRTF_Process {
 	int at; // Arrival Time
 	int rmt; // remaning time
 	int wt; // waiting time 
-	
 
-SRTF_Process(int i , int b , int a) {
-	id = i;
-	bt = b;
-	at = a;
-	rmt = b;
-	wt = 0;
-	
-	
-	
-}};
-void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &start, vector<SRTF_Process> &v);
 
-bool cmp(SRTF_Process A, SRTF_Process B){
+	SRTF_Process(int i, int b, int a) {
+		id = i;
+		bt = b;
+		at = a;
+		rmt = b;
+		wt = 0;
+
+
+
+	}
+};
+void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> &start, vector<SRTF_Process> &v);
+
+bool cmp(SRTF_Process A, SRTF_Process B) {
 	if (A.bt != B.bt)
 		return A.bt < B.bt;
 	else
@@ -41,35 +42,35 @@ int main()
 {
 	vector<SRTF_Process> sr;
 	vector<string> ids = { "p1","p2","p3","p4","p5" };
-	vector<int>burst = {10,5,3,6,3};
+	vector<int>burst = { 10,5,3,6,3 };
 	vector<int>arrival = { 0,1,2,24,25 };
 	vector<int> start;
-	
+
 	//the main function take 4 vectors 
-	SRTF(ids, burst, arrival,start, sr);
+	SRTF(ids, burst, arrival, start, sr);
 	//functions to calculate turn around & waiting times
 	/*for (int i = 0; i < ids.size(); i++) {
 		cout << "ID : " << ids[i] << " //Time :" << burst[i]  << " //Gap :" << arrival[i]<<" //start: "<<start[i] << endl;
 	}*/
 	//cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
 	//cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
-	
-	
+
+
 }
 
 void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
-{	
-	
+{
 
-	int time = 0, flag = 0, num=sr.size();
-	while (flag!=1)
-	{	
+
+	int time = 0, flag = 0, num = sr.size();
+	while (flag != 1)
+	{
 		flag = 1;
-		
+
 		for (int i = 0; i < sr.size(); i++) {
 
 			if (sr[i].rmt > 0 && sr[i].at <= time) {
-				
+
 				//cout << "At " << time << " : process NO. :" << sr[i].id << endl;
 				ids.push_back(sr[i].id);
 				sr[i].rmt--;
@@ -77,7 +78,7 @@ void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 				if (sr[i].rmt == 0) {
 					num--;
 				}
-				
+
 
 				for (int j = 0; j < sr.size(); j++) {
 					if (j != i && sr[j].at <= time && sr[j].rmt > 0) {
@@ -86,21 +87,21 @@ void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 
 				}
 				break;
-				
-				
-			}	
+
+
+			}
 
 		}
-		if (num != 0 && flag==1) {
+		if (num != 0 && flag == 1) {
 			flag = 0;
 			ids.push_back(-1);
 			for (int j = 0; j < sr.size(); j++) {
-				if ( sr[j].at <= time && sr[j].rmt > 0) {
+				if (sr[j].at <= time && sr[j].rmt > 0) {
 					sr[j].wt++;
 				}
 
 			}
-		
+
 		}
 		time++;
 
@@ -109,7 +110,7 @@ void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 
 	}
 	//cout << "the processes take " << time-1 << endl;
-	
+
 
 
 
@@ -117,7 +118,7 @@ void SRTF_Gantt_Chart(vector<SRTF_Process> &sr, vector<int> &ids)
 
 }
 float SRTF_Waiting_time(vector<SRTF_Process> &sr) {
-	
+
 	int total = 0;
 	for (int i = 0; i < sr.size(); i++) {
 
@@ -129,32 +130,35 @@ float SRTF_Waiting_time(vector<SRTF_Process> &sr) {
 	}
 
 	//cout<<"avg waiting time" << (1.0*total / sr.size())<<endl;
-	return (1.0*total / sr.size()) ;
+	return (1.0*total / sr.size());
 
 
 }
 float SRTF_Turn_Around(vector<SRTF_Process> &sr) {
-	
+
 	int total = 0;
-		for (int i = 0; i < sr.size(); i++) {
+	for (int i = 0; i < sr.size(); i++) {
 
-			total += sr[i].wt+sr[i].bt;
-
-
+		total += sr[i].wt + sr[i].bt;
 
 
-		}
-		
-		return (1.0*total / sr.size());
+
+
+	}
+
+	return (1.0*total / sr.size());
 }
 
 
-void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &start, vector<SRTF_Process> &v) {
+void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> &start, vector<SRTF_Process> &v) {
 	vector<int>time_line;
 	//to put the input in SRFT vector 
 
 	for (int i = 0; i < id.size(); i++) {
-		int temp = stoi(id[i].substr(1));
+		int j=0;
+		string stra = id[i];
+		for (; j < stra.length(); j++) {  if (isdigit(stra[j])) break; } 
+		int temp = stoi(id[i].substr(j));
 		v.push_back(SRTF_Process(temp, burst[i], arival[i]));
 	}
 	id.clear();
@@ -163,8 +167,8 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &
 
 	sort(v.begin(), v.end(), cmp);
 	SRTF_Gantt_Chart(v, time_line);
-	int lastid= time_line[0], gap=0, time=0;
-	
+	int lastid = time_line[0], gap = 0, time = 0;
+
 	time_line.push_back(-1);
 	for (int i = 0; i < time_line.size(); i++) {
 
@@ -178,7 +182,7 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &
 		}
 		else if (time_line[i] != lastid) {
 			if (lastid != -1 && time_line[i] != -1) {
-				id.push_back("P"+to_string(lastid));
+				id.push_back("P" + to_string(lastid));
 				burst.push_back(time);
 				arival.push_back(gap);
 				lastid = time_line[i];
@@ -186,7 +190,7 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &
 				gap = 0;
 			}
 			else if (lastid != -1 && time_line[i] == -1) {
-				id.push_back("P"+ to_string(lastid));
+				id.push_back("P" + to_string(lastid));
 				burst.push_back(time);
 				arival.push_back(gap);
 				lastid = time_line[i];
@@ -199,7 +203,7 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival,vector<int> &
 			}
 
 		}
-		
+
 
 
 
