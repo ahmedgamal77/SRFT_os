@@ -25,7 +25,7 @@ struct SRTF_Process {
 
 	}
 };
-void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> &start, vector<SRTF_Process> &v);
+void SRTF(vector<string>&id, vector<float>&burst, vector<float>&arival, vector<float> &start, vector<SRTF_Process> &v);
 
 bool cmp(SRTF_Process A, SRTF_Process B) {
 	if (A.bt != B.bt)
@@ -41,10 +41,10 @@ float SRTF_Turn_Around(vector<SRTF_Process> &sr);
 int main()
 {
 	vector<SRTF_Process> sr;
-	vector<string> ids = { "p1","p2","p3","p4","p5" };
-	vector<int>burst = { 10,5,3,6,3 };
-	vector<int>arrival = { 0,1,2,24,25 };
-	vector<int> start;
+	vector<string> ids = { "hossam","p2","p3","p4","p5" };
+	vector<float>burst = { 10.5,5.3,3,6,3 };
+	vector<float>arrival = { 0,1,2,24,25 };
+	vector<float> start;
 
 	//the main function take 4 vectors 
 	SRTF(ids, burst, arrival, start, sr);
@@ -52,8 +52,8 @@ int main()
 	for (int i = 0; i < ids.size(); i++) {
 		cout << "ID : " << ids[i] << " //Time :" << burst[i]  << " //Gap :" << arrival[i]<<" //start: "<<start[i] << endl;
 	}
-	//cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
-	//cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
+	cout<<"turn around time: "<<SRTF_Turn_Around(sr)<<endl;
+	cout<<"waiting time"<<SRTF_Waiting_time(sr)<<endl;
 
 
 }
@@ -130,7 +130,7 @@ float SRTF_Waiting_time(vector<SRTF_Process> &sr) {
 	}
 
 	//cout<<"avg waiting time" << (1.0*total / sr.size())<<endl;
-	return (1.0*total / sr.size());
+	return ((1.0*total / sr.size()) / 100);
 
 
 }
@@ -146,17 +146,17 @@ float SRTF_Turn_Around(vector<SRTF_Process> &sr) {
 
 	}
 
-	return (1.0*total / sr.size());
+	return ((1.0*total / sr.size())/100);
 }
 
 
-void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> &start, vector<SRTF_Process> &v) {
+void SRTF(vector<string>&id, vector<float>&burst, vector<float>&arival, vector<float> &start, vector<SRTF_Process> &v) {
 	vector<string>time_line;
 	//to put the input in SRFT vector 
 
 	for (int i = 0; i < id.size(); i++) {
 		
-		v.push_back(SRTF_Process(id[i], burst[i], arival[i]));
+		v.push_back(SRTF_Process(id[i], burst[i]*100, arival[i]*100));
 	}
 	id.clear();
 	burst.clear();
@@ -181,16 +181,16 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> 
 		else if (time_line[i] != lastid) {
 			if (lastid !="-1" && time_line[i] != "-1") {
 				id.push_back(lastid);
-				burst.push_back(time);
-				arival.push_back(gap);
+				burst.push_back(1.0*time/100);
+				arival.push_back(1.0*gap/100);
 				lastid = time_line[i];
 				time = 1;
 				gap = 0;
 			}
 			else if (lastid != "-1" && time_line[i] == "-1") {
 				id.push_back(lastid);
-				burst.push_back(time);
-				arival.push_back(gap);
+				burst.push_back(1.0*time/100);
+				arival.push_back(1.0*gap/100);
 				lastid = time_line[i];
 				time = 0;
 				gap = 1;
@@ -209,7 +209,7 @@ void SRTF(vector<string>&id, vector<int>&burst, vector<int>&arival, vector<int> 
 
 
 	}
-	int sta = 0;
+	float sta = 0;
 	for (int i = 0; i < burst.size(); i++) {
 		sta += arival[i];
 		start.push_back(sta);
